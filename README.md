@@ -2,6 +2,12 @@
 JavaScript 101
 Primeiros contatos com javascript Nodejs
 
+## Prerequisitos
+
+### Node.js
+
+Instalar seguindo as instruções no site oficial [Node](https://nodejs.org/en/download/package-manager/)
+
 ## NodeServer
 Implemetando um servidor http com serviços basicos.  
 **Desafio:**
