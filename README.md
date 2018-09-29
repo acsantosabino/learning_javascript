@@ -23,7 +23,7 @@ Instalar seguindo as instruções no site oficial [MongoDb](https://docs.mongodb
 
 ## NodeServer
 
-Implemetando um servidor http com serviços basicos.  
+Implemetando um servidor http com serviços basicos.
 **Desafio:**
 ```
 Crie três serviços num servidor HTTP. Um para incluir candidato, outro para excluir
@@ -35,7 +35,7 @@ candidatos e suas porcentagens de votação.
 
 ## MongoDB
 
-Implemetando um banco de dados MongoDB.  
+Implemetando um banco de dados MongoDB.
 **Desafio:**
 ```
 Utilizando um cliente do MongoDB crie um banco de dados e realize as seguintes
@@ -52,5 +52,16 @@ operações:
 
 ## NodeServerExpress
 
-Implemetando um servidor http com node express.  
+Implemetando um servidor http com node express.
 **Desafio:**
+```
+Criar um microserviço com NodeExpress que permita e realize as seguintes
+operações em um banco de dados do MongoDB:
+- Inclua algumas vendas.
+- Inclua alguns produtos em algumas vendas.
+- Altere algumas vendas.
+- Liste as vendas.
+- Mostre o total de vendas.
+- Explore os comandos do MongoDB.
+- Exclua as vendas.
+```
