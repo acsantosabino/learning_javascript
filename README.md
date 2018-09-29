@@ -8,6 +8,13 @@ Primeiros contatos com javascript Nodejs
 
 Instalar seguindo as instruções no site oficial [Node](https://nodejs.org/en/download/package-manager/)
 
+### Node Express
+
+Instalar pacotes node
+```
+npm install
+```
+
 ### MongoDB
 
 Instalar seguindo as instruções no site oficial [MongoDb](https://docs.mongodb.com/manual/administration/install-community/)

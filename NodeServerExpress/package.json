@@ -1,0 +1,23 @@
+{
+  "name": "nodeserverexpress",
+  "version": "1.0.0",
+  "description": "Implemetando um servidor http com node express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acsantosabino/learning_javascript.git"
+  },
+  "author": "Arthur Santos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acsantosabino/learning_javascript/issues"
+  },
+  "homepage": "https://github.com/acsantosabino/learning_javascript#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "mongodb": "^3.1.6"
+  }
+}
