@@ -1,18 +1,19 @@
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/mydb";
+var url = "mongodb://localhost:27017/comercio";
 
+/* Cria base de dados se ela não existir */
 MongoClient.connect(url, function (err, db) {
     if (err) throw err;
     console.log("Database created!");
     db.close();
 });
 
-
+/* Lista todas as vendas registradas na base de dados */
 function listarVendas() {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
-        dbo.collection("vendas").find({}).toArray(function (err, res) {
+        var vendas = dbo.collection("vendas").find({}).toArray(function (err, res) {
             if (err) throw err;
             console.log(JSON.stringify(res));
             db.close();
@@ -20,6 +21,21 @@ function listarVendas() {
     });
 }
 
+/* Busca venda na base de dados pelo codigo */
+function selecionarVenda(vendaCod) {
+    MongoClient.connect(url, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db("comercio");
+        var myquery = { codigo: vendaCod };
+        dbo.collection("vendas").find(myquery).toArray(function (err, res) {
+            if (err) throw err;
+            console.log(JSON.stringify(res));
+            db.close();
+        });
+    });
+}
+
+/* Adiciona nova venda à base de dados */
 function incluirVenda(venda) {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
@@ -31,6 +47,8 @@ function incluirVenda(venda) {
         });
     });
 }
+
+/* Remove venda da base de dados */
 function excluirVenda(vendaCod) {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
@@ -43,6 +61,8 @@ function excluirVenda(vendaCod) {
         });
     });
 }
+
+/* Edita venda da base de dados */
 function editaVenda(venda){
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
@@ -56,6 +76,8 @@ function editaVenda(venda){
         });
     });
 }
+
+/* Adiciona novos produtos a uma venda ja registrada na base de dados */
 function incluirProdutos(vendaCod, newProdutos) {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
@@ -69,6 +91,8 @@ function incluirProdutos(vendaCod, newProdutos) {
         });
     });
 }
+
+/* Remove produtos de uma venda ja registrada na base de dados */
 function excluirProdutos(vendaCod, newProdutos) {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
@@ -82,12 +106,13 @@ function excluirProdutos(vendaCod, newProdutos) {
         });
     });
 }
+
+/* Recalcula valor total de uma venda ja registrada na base de dados */
 function calcValorVenda(vendaCod) {
     MongoClient.connect(url, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { $match : { codigo: vendaCod }};
-        // var newvalues = { $pullAll: { produtos : newProdutos }};
         dbo.collection("vendas").aggregate(
             [{ $match : { codigo: vendaCod }},
             {$unwind:"$produtos"},
@@ -104,22 +129,10 @@ function calcValorVenda(vendaCod) {
         });
     });
 }
-// listarVendas();
-// incluirVenda({ "codigo": "C2V002", "vendedor": "Josias", "valor": 11 });
-// listarVendas();
-// excluirVenda("C2V002");
-// listarVendas();
-// incluirProdutos("C2V001",[{"nome":"arroz","preco":11.5,"qnt":2},{"nome":"feijão","preco":3.8,"qnt":3},{"nome":"almondega","preco":1.3,"qnt":10}]);
-// listarVendas();
-// excluirProdutos("C2V001",[{"nome":"arroz","preco":11.5,"qnt":2},{"nome":"feijão","preco":3.8,"qnt":3},{"nome":"almondega","preco":1.3,"qnt":10}]);
-// calcValorVenda("C2V001");
-// editaVenda({"codigo":"C2V001","valor":10,"produtos":[{"nome":"arroz","preco":11.5,"qnt":2},{"nome":"feijão","preco":3.8,"qnt":3},{"nome":"almondega","preco":1.3,"qnt":10}]})
-// listarVendas();
-// editaVenda({"codigo":"C2V001","valor":11,"produtos":[{"nome":"microondas","preco":150,"qnt":1}]})
-// listarVendas();
 
 module.exports = {
     listarVendas,
+    selecionarVenda,
     incluirVenda,
     excluirVenda,
     editaVenda,
