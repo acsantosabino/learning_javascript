@@ -2,34 +2,34 @@ var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/comercio";
 
 /* Cria base de dados se ela não existir */
-MongoClient.connect(url, function (err, db) {
+MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
     if (err) throw err;
     console.log("Database created!");
     db.close();
 });
 
 /* Lista todas as vendas registradas na base de dados */
-function listarVendas() {
-    MongoClient.connect(url, function (err, db) {
+function listarVendas(res) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
-        var vendas = dbo.collection("vendas").find({}).toArray(function (err, res) {
+        var vendas = dbo.collection("vendas").find({}).toArray(function (err, obj) {
             if (err) throw err;
-            console.log(JSON.stringify(res));
+            res.send(obj);
             db.close();
         });
     });
 }
 
 /* Busca venda na base de dados pelo codigo */
-function selecionarVenda(vendaCod) {
-    MongoClient.connect(url, function (err, db) {
+function selecionarVenda(vendaCod, res) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { codigo: vendaCod };
-        dbo.collection("vendas").find(myquery).toArray(function (err, res) {
+        dbo.collection("vendas").find(myquery).toArray(function (err, obj) {
             if (err) throw err;
-            console.log(JSON.stringify(res));
+            res.send(obj);
             db.close();
         });
     });
@@ -37,10 +37,10 @@ function selecionarVenda(vendaCod) {
 
 /* Adiciona nova venda à base de dados */
 function incluirVenda(venda) {
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
-        dbo.collection("vendas").insertOne(venda, function (err, res) {
+        dbo.collection("vendas").insertOne(venda, function (err, obj) {
             if (err) throw err;
             console.log("1 document inserted");
             db.close();
@@ -50,11 +50,11 @@ function incluirVenda(venda) {
 
 /* Remove venda da base de dados */
 function excluirVenda(vendaCod) {
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { codigo: vendaCod };
-        dbo.collection("vendas").deleteOne(myquery, function (err, res) {
+        dbo.collection("vendas").deleteOne(myquery, function (err, obj) {
             if (err) throw err;
             console.log("1 document deleted");
             db.close();
@@ -64,14 +64,15 @@ function excluirVenda(vendaCod) {
 
 /* Edita venda da base de dados */
 function editaVenda(venda){
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { codigo: venda.codigo };
         var newvalues = { $set: venda };
-        dbo.collection("vendas").updateMany(myquery, newvalues, function (err, res) {
+        if( 'produtos' in venda){ delete venda['produtos']}
+        dbo.collection("vendas").updateMany(myquery, newvalues, function (err, obj) {
             if (err) throw err;
-            console.log("1 document updated");
+            calcValorVenda(venda.codigo);
             db.close();
         });
     });
@@ -79,14 +80,14 @@ function editaVenda(venda){
 
 /* Adiciona novos produtos a uma venda ja registrada na base de dados */
 function incluirProdutos(vendaCod, newProdutos) {
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { codigo: vendaCod };
         var newvalues = { $addToSet: { produtos : { $each: newProdutos} }};
-        dbo.collection("vendas").updateMany(myquery, newvalues, function (err, res) {
+        dbo.collection("vendas").updateMany(myquery, newvalues, function (err, obj) {
             if (err) throw err;
-            console.log("1 document updated");
+            calcValorVenda(vendaCod);
             db.close();
         });
     });
@@ -94,14 +95,14 @@ function incluirProdutos(vendaCod, newProdutos) {
 
 /* Remove produtos de uma venda ja registrada na base de dados */
 function excluirProdutos(vendaCod, newProdutos) {
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { codigo: vendaCod };
         var newvalues = { $pullAll: { produtos : newProdutos }};
-        dbo.collection("vendas").updateMany(myquery, newvalues, function (err, res) {
+        dbo.collection("vendas").updateMany(myquery, newvalues, function (err, obj) {
             if (err) throw err;
-            console.log("1 document updated");
+            calcValorVenda(vendaCod);
             db.close();
         });
     });
@@ -109,7 +110,7 @@ function excluirProdutos(vendaCod, newProdutos) {
 
 /* Recalcula valor total de uma venda ja registrada na base de dados */
 function calcValorVenda(vendaCod) {
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
         var dbo = db.db("comercio");
         var myquery = { $match : { codigo: vendaCod }};
@@ -121,10 +122,9 @@ function calcValorVenda(vendaCod) {
                 codigo : { $last : "$codigo"},
                 valor : { $sum : { $multiply : ['$produtos.qnt','$produtos.preco']}}
             }}]
-            ).toArray(function(err, res) {
+            ).toArray(function(err, obj) {
                 if (err) throw err;
-                console.log(JSON.stringify(res));
-                editaVenda(res[0]);
+                editaVenda(obj[0]);
                 db.close();
         });
     });
